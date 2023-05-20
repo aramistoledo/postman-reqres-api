@@ -20,6 +20,10 @@
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
+									"pm.test(\"Verificar método GET\", function () {\r",
+									"    pm.expect(pm.request.method).to.equal(\"GET\");\r",
+									"});\r",
+									"\r",
 									"pm.test(\"page deve ser 2\", function () {\r",
 									"    var jsonData = pm.response.json();\r",
 									"    pm.expect(jsonData.page).to.be.equal(2);\r",
@@ -42,8 +46,8 @@
 									"\r",
 									"pm.test(\"A resposta deve ser válida e ter um corpo\", function () {\r",
 									"     pm.response.to.be.ok;\r",
-									"     pm.response.to.be.withBody;\r",
 									"     pm.response.to.be.json;\r",
+									"     pm.expect(pm.response.json()).to.not.be.empty;\r",
 									"})\r",
 									"\r",
 									"pm.test(\"Content-Type esta presente\", function () {\r",
@@ -118,9 +122,10 @@
 									"\r",
 									"pm.test(\"A resposta deve ser válida e ter um corpo\", function () {\r",
 									"     pm.response.to.be.ok;\r",
-									"     pm.response.to.be.withBody;\r",
 									"     pm.response.to.be.json;\r",
+									"     pm.expect(pm.response.json()).to.not.be.empty;\r",
 									"})\r",
+									"\r",
 									"pm.test(\"Content-Type is present\", function () {\r",
 									"    pm.response.to.have.header(\"Content-Type\");\r",
 									"});\r",
@@ -157,7 +162,10 @@
 									"pm.test(\"Status code é 404\", function () {\r",
 									"    pm.response.to.have.status(404);\r",
 									"});\r",
-									""
+									"\r",
+									"pm.test(\"Verificar ausência de corpo na resposta\", function () {\r",
+									"    pm.expect(pm.response.json()).to.be.empty;\r",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -324,6 +332,12 @@
 									"    pm.response.to.have.status(201);\r",
 									"});\r",
 									"\r",
+									"// Teste para verificar se o método POST está sendo usado\r",
+									"pm.test(\"Verificar método POST\", function () {\r",
+									"    pm.expect(pm.request.method).to.equal(\"POST\");\r",
+									"});\r",
+									"\r",
+									"\r",
 									"pm.test(\"Nome deve ser morpheus\", function () {\r",
 									"    var jsonData = pm.response.json();\r",
 									"    pm.expect(jsonData.name).to.be.equal(\"morpheus\");\r",
@@ -373,6 +387,10 @@
 								"exec": [
 									"pm.test(\"Status code é 200\", function () {\r",
 									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verificar método PUT\", function () {\r",
+									"    pm.expect(pm.request.method).to.equal(\"PUT\");\r",
 									"});\r",
 									"\r",
 									"pm.test(\"Nome deve ser morpheus\", function () {\r",
@@ -426,6 +444,10 @@
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
+									"pm.test(\"Verificar método PATCH\", function () {\r",
+									"    pm.expect(pm.request.method).to.equal(\"PATCH\");\r",
+									"});\r",
+									"\r",
 									"pm.test(\"Nome deve ser morpheus\", function () {\r",
 									"    var jsonData = pm.response.json();\r",
 									"    pm.expect(jsonData.name).to.be.equal(\"morpheus\");\r",
@@ -475,6 +497,10 @@
 								"exec": [
 									"pm.test(\"Status code é 204\", function () {\r",
 									"    pm.response.to.have.status(204);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verificar método DELETE\", function () {\r",
+									"    pm.expect(pm.request.method).to.equal(\"DELETE\");\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -507,7 +533,13 @@
 								"exec": [
 									"pm.test(\"Status code é 200\", function () {\r",
 									"    pm.response.to.have.status(200);\r",
-									"});"
+									"});\r",
+									"\r",
+									"pm.test(\"A resposta deve ser válida e ter um corpo\", function () {\r",
+									"     pm.response.to.be.ok;\r",
+									"     pm.response.to.be.json;\r",
+									"     pm.expect(pm.response.json()).to.not.be.empty;\r",
+									"})"
 								],
 								"type": "text/javascript"
 							}
@@ -547,6 +579,10 @@
 								"exec": [
 									"pm.test(\"Status code é 400\", function () {\r",
 									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verificar erro no corpo da resposta\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include.oneOf([\"error\", \"erro\"]);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -587,7 +623,13 @@
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {\r",
 									"    pm.response.to.have.status(200);\r",
-									"});"
+									"});\r",
+									"\r",
+									"pm.test(\"A resposta deve ser válida e ter um corpo\", function () {\r",
+									"     pm.response.to.be.ok;\r",
+									"     pm.response.to.be.json;\r",
+									"     pm.expect(pm.response.json()).to.not.be.empty;\r",
+									"})"
 								],
 								"type": "text/javascript"
 							}
@@ -627,6 +669,10 @@
 								"exec": [
 									"pm.test(\"Status code é 400\", function () {\r",
 									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verificar erro no corpo da resposta\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include.oneOf([\"error\", \"erro\"]);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -673,6 +719,12 @@
 									"    pm.expect(pm.response.responseTime).to.be.above(1000);\r",
 									"     pm.expect(pm.response.responseTime).to.be.below(5000);\r",
 									"});\r",
+									"\r",
+									"pm.test(\"A resposta deve ser válida e ter um corpo\", function () {\r",
+									"     pm.response.to.be.ok;\r",
+									"     pm.response.to.be.json;\r",
+									"     pm.expect(pm.response.json()).to.not.be.empty;\r",
+									"})\r",
 									""
 								],
 								"type": "text/javascript"
