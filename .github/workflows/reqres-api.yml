@@ -20,23 +20,32 @@ jobs:
           newman --version
           node --version
 
-      - name: Step 2 Install Newman-Reporter-HTML
-        run: npm install -g newman-reporter-html
+      - name: Step 2 Install Newman-Reporter-Htmlextra
+        run: sudo npm install -g newman-reporter-htmlextra
 
       - name: Step 3 Execute collection
-        run: newman run ./reqres-api.json -r html --reporter-html-export ./newman-report.html
+        run: newman run ./reqres-api.json --reporters cli,htmlextra --reporter-htmlextra-export ./results/Report.html
 
-      - name: Step 4 Archive Newman report
+      - name: Step 4 Archive production artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: newman-report
-          path: ./newman-report.html
+          name: report
+          path: ./results/Report.html
 
-      - name: Validate links
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@master
-          - name: Validate links
-            uses: ad-m/report-link-action@master
-            with:
-              github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Report Link Comment
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const fs = require('fs');
+            const { getOctokit, context } = require('@actions/github');
+            
+            const reportPath = './results/Report.html';
+            const reportURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${context.sha}/${reportPath}`;
+            
+            const octokit = getOctokit(process.env.GITHUB_TOKEN);
+            octokit.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `The test report is available [here](${reportURL}).`
+            });
