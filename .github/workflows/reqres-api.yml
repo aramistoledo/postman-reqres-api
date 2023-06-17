@@ -35,23 +35,20 @@ jobs:
         id: report-link
         run: |
           echo "REPORT_PATH=$(realpath ./results/Report.html)" >> $GITHUB_ENV
-          
-      - name: Install @octokit/core
-        run: npm install @octokit/core
+
+      - name: Install @actions/github
+        run: npm install @actions/github
 
       - name: Step 6 Create Report Link Comment
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const reportPath = process.env.REPORT_PATH;
-            const reportURL = `https://github.com/${{ github.repository }}/blob/${{ github.sha }}${reportPath}`;
-            const { Octokit } = require("@octokit/core");
-            const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+        run: |
+          const { getOctokit, context } = require('@actions/github');
+          const reportPath = process.env.REPORT_PATH;
+          const reportURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${context.sha}${reportPath}`;
+          const octokit = getOctokit(process.env.GITHUB_TOKEN);
 
-            octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
-              owner: "${{ github.repository_owner }}",
-              repo: "${{ github.repository }}",
-              issue_number: "${{ github.event.issue.number }}",
-              body: `The test report is available [here](${reportURL}).`
-            });
+          octokit.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.payload.issue.number,
+            body: `The test report is available [here](${reportURL}).`
+          });
