@@ -43,13 +43,12 @@ jobs:
           script: |
             const reportPath = "${{ steps.report-link.outputs.report_path }}";
             const reportURL = `https://github.com/${{ github.repository }}/blob/${{ github.sha }}/${reportPath}`;
-            const { Octokit } = require("@octokit/core");
-            const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+            const { GitHub, context } = require("@actions/github");
+            const octokit = new GitHub(process.env.GITHUB_TOKEN);
 
-            octokit.request("POST /repos/{owner}/{repo}/issues/{issue_number}/comments", {
+            octokit.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
               body: `The test report is available [here](${reportURL}).`
             });
-
