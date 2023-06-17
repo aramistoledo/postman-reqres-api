@@ -23,29 +23,37 @@ jobs:
       - name: Step 2 Install Newman-Reporter-HTML
         run: sudo npm install -g newman-reporter-html
 
-      - name: Step 3 Execute collection and generate HTML report
-        run: newman run ./reqres-api.json -r html --reporter-html-export ./newman-report.html
+      - name: Step 3 Execute collection
+        run: newman run ./reqres-api.json -r html
 
-      - name: Step 4 Archive HTML report
+      - name: Step 4 Archive Newman HTML report
         uses: actions/upload-artifact@v2
         with:
           name: newman-report
-          path: ./newman-report.html
-
-      - name: Install @actions/github
-        run: npm install @actions/github
+          path: newman/*.html
 
       - name: Step 5 Create Report Link Comment
         run: |
           node -e '
           const { getOctokit, context } = require("@actions/github");
-          const reportURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${context.sha}/newman-report.html`;
+          const fs = require("fs");
+
+          const reportPath = "newman/*.html";
+          const reportFiles = fs.readdirSync(reportPath);
+          const reportURLs = reportFiles.map(file => {
+            const reportURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${context.sha}/${reportPath}/${file}`;
+            return `[${file}](${reportURL})`;
+          });
+
+          const reportComment = `The test report is available at the following link(s):\n\n${reportURLs.join("\n")}`;
           const octokit = getOctokit(process.env.GITHUB_TOKEN);
 
           octokit.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: context.payload.issue.number,
-            body: `The test report is available [here](${reportURL}).`
+            body: reportComment
           });
           '
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
