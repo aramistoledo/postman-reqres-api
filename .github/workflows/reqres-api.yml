@@ -37,4 +37,4 @@ jobs:
           path: ./allure-report
 
       - name: Set Allure Report URL
-        run: echo "ALLURE_REPORT_URL=https://github.com/$GITHUB_REPOSITORY/actions/artifacts/$GITHUB_RUN_ID" >> $GITHUB_ENV
+        run: echo ".github/workflows/pipeline-allure-report.yml=https://github.com/$GITHUB_REPOSITORY/actions/artifacts/$GITHUB_RUN_ID" >> $GITHUB_ENV
