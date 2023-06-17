@@ -36,17 +36,20 @@ jobs:
         run: |
           echo "::set-output name=report_path::$(realpath ./results/Report.html)"
 
-      - name: Step 6 Create Report Link Comment
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const reportPath = "${{ steps.report-link.outputs.report_path }}";
-            const reportURL = `https://github.com/${{ github.repository }}/blob/${{ github.sha }}/${reportPath}`;
-            const commentBody = `The test report is available [here](${reportURL}).`;
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: commentBody
-            });
+- name: Step 6 Create Report Link Comment
+  uses: actions/github-script@v4
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    script: |
+      const reportPath = "${{ steps.report-link.outputs.report_path }}";
+      const reportURL = `https://github.com/${{ github.repository }}/blob/${{ github.sha }}/${reportPath}`;
+      const context = github.context;
+      const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+      
+      octokit.issues.createComment({
+        issue_number: context.issue.number,
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        body: `The test report is available [here](${reportURL}).`
+      });
+
