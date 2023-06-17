@@ -22,15 +22,22 @@ jobs:
 
       - name: Step 2 Install Newman-Reporter-Allure
         run: sudo npm install -g newman-reporter-allure
-
-      - name: Step 3 Execute collection
-        run: newman run ./reqres-api.json -r allure --reporter-allure-export ./allure-results
-
+        
       - name: Step 4 Archive Allure results
         uses: actions/upload-artifact@v2
         with:
           name: allure-results
           path: ./allure-results
+
+      - name: Download and Install Allure CLI
+        run: |
+          wget https://github.com/allure-framework/allure2/releases/latest/download/allure-2.22.4.zip
+          unzip allure-2.22.4.zip -d allure
+          sudo ln -s allure/allure-2.22.4/bin/allure /usr/bin/allure
+          export PATH="/usr/bin/allure:$PATH"
+
+      - name: Step 3 Execute collection
+        run: newman run ./reqres-api.json -r allure --reporter-allure-export ./allure-results
 
       - name: Download and Install Allure CLI
         run: |
