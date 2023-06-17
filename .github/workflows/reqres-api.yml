@@ -1,4 +1,4 @@
-name: Postman Allure Report
+name: Postman Tests with Allure Report
 
 on:
   push:
@@ -14,18 +14,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
       - name: Install Newman and Allure Command Line
         run: |
           npm install -g newman
           npm install -g allure-commandline
 
       - name: Execute Postman collection
-        run: newman run ./reqres-api.json --reporters allure
+        run: newman run ./reqres-api.json --reporters cli,junit --reporter-junit-export ./newman-results.xml
 
       - name: Generate Allure Report
         run: allure generate -c -o ./allure-report
@@ -37,4 +32,4 @@ jobs:
           path: ./allure-report
 
       - name: Set Allure Report URL
-        run: echo "https://github.com/aramistoledo/postman-reqres-api/suites/13672127149/artifacts/755318426" >> $GITHUB_ENV
+        run: echo "ALLURE_REPORT_URL=https://github.com/$GITHUB_REPOSITORY/actions/artifacts/$GITHUB_RUN_ID" >> $GITHUB_ENV
