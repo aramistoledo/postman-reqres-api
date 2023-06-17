@@ -20,38 +20,26 @@ jobs:
           newman --version
           node --version
 
-      - name: Step 2 Install Newman-Reporter-Allure
-        run: sudo npm install -g newman-reporter-allure
+      - name: Step 2 Install Newman-Reporter-HTML
+        run: sudo npm install -g newman-reporter-html
 
-      - name: Step 3 Execute collection
-        run: newman run ./reqres-api.json -r allure --reporter-allure-export ./allure-results
+      - name: Step 3 Execute collection and generate HTML report
+        run: newman run ./reqres-api.json -r html --reporter-html-export ./newman-report.html
 
-      - name: Step 4 Archive Allure results
+      - name: Step 4 Archive HTML report
         uses: actions/upload-artifact@v2
         with:
-          name: allure-results
-          path: ./allure-results
-
-      - name: Download and Install Allure CLI
-        run: |
-          wget https://github.com/allure-framework/allure2/releases/download/2.13.0/allure-2.13.0.zip
-          unzip allure-2.13.0.zip -d allure
-          sudo ln -s allure/allure-2.13.0/bin/allure /usr/bin/allure
-
-      - name: Step 5 Generate Allure Report
-        run: |
-          allure generate ./allure-results -o ./allure-report
-          echo "ALLURE_REPORT_PATH=$(realpath ./allure-report)" >> $GITHUB_ENV
+          name: newman-report
+          path: ./newman-report.html
 
       - name: Install @actions/github
         run: npm install @actions/github
 
-      - name: Step 6 Create Report Link Comment
+      - name: Step 5 Create Report Link Comment
         run: |
           node -e '
           const { getOctokit, context } = require("@actions/github");
-          const reportPath = process.env.ALLURE_REPORT_PATH;
-          const reportURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${context.sha}${reportPath}`;
+          const reportURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${context.sha}/newman-report.html`;
           const octokit = getOctokit(process.env.GITHUB_TOKEN);
 
           octokit.rest.issues.createComment({
