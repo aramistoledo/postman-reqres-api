@@ -25,11 +25,21 @@ jobs:
       - name: Generate Allure Report
         run: allure generate -c -o ./allure-report
 
-      - name: Archive Allure Report
-        uses: actions/upload-artifact@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          name: allure-report
-          path: ./allure-report
+          node-version: '14'
 
-      - name: Set Allure Report URL
-        run: echo "ALLURE_REPORT_URL=https://github.com/$GITHUB_REPOSITORY/actions/artifacts/$GITHUB_RUN_ID" >> $GITHUB_ENV
+      - name: Build and Deploy to GitHub Pages
+        run: |
+          npm install -g allure-commandline
+          allure generate allure-results --clean -o allure-report
+          echo '<meta http-equiv="refresh" content="0;url=allure-report/index.html">' > allure-report/index.html
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy Report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
