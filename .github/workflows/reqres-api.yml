@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Step 1 Check version Newman and Node
         run: |
@@ -47,7 +48,8 @@ jobs:
 
       - name: Step 6 Create Report Link Comment
         run: |
-          const { getOctokit, context } = require('@actions/github');
+          node -e '
+          const { getOctokit, context } = require("@actions/github");
           const reportPath = process.env.ALLURE_REPORT_PATH;
           const reportURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${context.sha}${reportPath}`;
           const octokit = getOctokit(process.env.GITHUB_TOKEN);
@@ -58,3 +60,4 @@ jobs:
             issue_number: context.payload.issue.number,
             body: `The test report is available [here](${reportURL}).`
           });
+          '
