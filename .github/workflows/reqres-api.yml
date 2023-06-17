@@ -34,14 +34,14 @@ jobs:
       - name: Step 5 Generate Report Link
         id: report-link
         run: |
-          echo "::set-output name=report_path::$(realpath ./results/Report.html)"
+          echo "REPORT_PATH=$(realpath ./results/Report.html)" >> $GITHUB_ENV
           
       - name: Step 6 Create Report Link Comment
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const reportPath = "${{ steps.report-link.outputs.report_path }}";
+            const reportPath = process.env.REPORT_PATH;
             const reportURL = `https://github.com/${{ github.repository }}/blob/${{ github.sha }}/${reportPath}`;
             const { context } = require("@actions/github");
             const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
