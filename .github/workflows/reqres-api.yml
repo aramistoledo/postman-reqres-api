@@ -32,7 +32,6 @@ jobs:
           path: ./newman
 
       - name: Step 5 Generate Allure Report
-        uses: "GITHUB_TOKEN"
         run: |
           allure generate ./newman -o ./allure-report
           echo "ALLURE_REPORT_PATH=$(realpath ./allure-report)" >> $GITHUB_ENV
