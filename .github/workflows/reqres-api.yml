@@ -36,6 +36,9 @@ jobs:
         run: |
           echo "REPORT_PATH=$(realpath ./results/Report.html)" >> $GITHUB_ENV
           
+      - name: Install @octokit/core
+        run: npm install @octokit/core
+
       - name: Step 6 Create Report Link Comment
         uses: actions/github-script@v4
         with:
