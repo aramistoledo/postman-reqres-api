@@ -19,22 +19,23 @@ jobs:
           newman --version
           node --version
 
-      - name: Step 2 Install Newman-Reporter-Htmlextra
-        run: sudo npm install -g newman-reporter-htmlextra
+      - name: Step 2 Install Newman-Reporter-Allure
+        run: sudo npm install -g newman-reporter-allure
 
       - name: Step 3 Execute collection
-        run: newman run ./reqres-api.json --reporters cli -r htmlextra --reporter-htmlextra-export ./results/Report.html
+        run: newman run ./reqres-api.json -r allure
 
-      - name: Step 4 Archive production artifacts
+      - name: Step 4 Archive Allure results
         uses: actions/upload-artifact@v2
         with:
-          name: report
-          path: ./results/Report.html
+          name: allure-results
+          path: ./newman
 
-      - name: Step 5 Generate Report Link
-        id: report-link
+      - name: Step 5 Generate Allure Report
+        uses: "GITHUB_TOKEN"
         run: |
-          echo "REPORT_PATH=$(realpath ./results/Report.html)" >> $GITHUB_ENV
+          allure generate ./newman -o ./allure-report
+          echo "ALLURE_REPORT_PATH=$(realpath ./allure-report)" >> $GITHUB_ENV
 
       - name: Install @actions/github
         run: npm install @actions/github
@@ -42,7 +43,7 @@ jobs:
       - name: Step 6 Create Report Link Comment
         run: |
           const { getOctokit, context } = require('@actions/github');
-          const reportPath = process.env.REPORT_PATH;
+          const reportPath = process.env.ALLURE_REPORT_PATH;
           const reportURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${context.sha}${reportPath}`;
           const octokit = getOctokit(process.env.GITHUB_TOKEN);
 
