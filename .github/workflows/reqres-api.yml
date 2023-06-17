@@ -31,21 +31,3 @@ jobs:
         with:
           name: newman-report
           path: ./newman-report.html
-
-      - name: Install @actions/github
-        run: npm install @actions/github
-
-      - name: Step 5 Create Report Link Comment
-        run: |
-          node -e '
-          const { getOctokit, context } = require("@actions/github");
-          const reportURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${context.sha}/newman-report.html`;
-          const octokit = getOctokit();
-
-          octokit.rest.issues.createComment({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            issue_number: context.payload.issue.number,
-            body: `The test report is available [here](${reportURL}).`
-          });
-          '
