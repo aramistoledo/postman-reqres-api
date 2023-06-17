@@ -31,3 +31,21 @@ jobs:
         with:
           name: report
           path: ./results/Report.html
+
+      - name: Step 5 Create report link
+        id: create_report_link
+        run: |
+          echo "::set-output name=url::$(echo ${{ github.server_url }}/${{ github.repository }}/${{ github.run_id }}/artifacts/download/report/Report.html)"
+
+      - name: Step 6 Comment with report link
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const reportLink = context.outputs.create_report_link;
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `View the HTML report: [Report](${reportLink})`
+            })
