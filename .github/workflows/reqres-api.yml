@@ -1,11 +1,10 @@
-name: Postman Teste reqres Api
+name: Postman Allure Report
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  workflow_dispatch:
 
 jobs:
   build:
@@ -15,37 +14,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Step 1 Check version Newman and Node
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install Newman and Allure Command Line
         run: |
-          newman --version
-          node --version
+          npm install -g newman
+          npm install -g allure-commandline
 
-      - name: Step 2 Install Newman-Reporter-Htmlextra
-        run: npm install -g newman-reporter-htmlextra
+      - name: Execute Postman collection
+        run: newman run ./reqres-api.json --reporters allure
 
-      - name: Step 3 Execute collection
-        run: newman run ./reqres-api.json --reporters cli,htmlextra --reporter-htmlextra-export ./results/Report.html
+      - name: Generate Allure Report
+        run: allure generate -c -o ./allure-report
 
-      - name: Step 4 Archive production artifacts
+      - name: Archive Allure Report
         uses: actions/upload-artifact@v2
         with:
-          name: report
-          path: ./results/Report.html
-
-      - name: Step 5 Create report link
-        id: create_report_link
-        run: |
-          echo "REPORT_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/download/report/Report.html" >> $GITHUB_ENV
-
-      - name: Step 6 Comment with report link
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const reportLink = process.env.REPORT_URL;
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `View the HTML report: [Report](${reportLink})`
-            })
+          name: allure-report
+          path: ./allure-report
